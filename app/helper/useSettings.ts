@@ -5,6 +5,7 @@ import axios from 'axios';
 // Type definition (agera code theke nite paren)
 export type Settings = {
   siteName: string;
+  siteURL: string;
   tagline: string;
   address: string;
   email: string;
