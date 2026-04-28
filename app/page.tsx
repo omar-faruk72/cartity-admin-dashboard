@@ -1,65 +1,200 @@
-import Image from "next/image";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import React, { useState, ChangeEvent, FormEvent } from "react";
+import axios from "axios";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useAuth } from "./context/authContext";
+import { BASE_URL } from "./helper/BASE_URL";
 
 export default function Home() {
+  const { loginUser } = useAuth();
+  const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    rememberMe: false,
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const loadId = toast.loading("Signing in...");
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/auth/login`,
+        formData,
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        const userData = response.data.data.user;
+
+        // context এ save
+        loginUser(userData);
+
+        // 🔐 Role based logic
+        if (userData.role === "admin") {
+          toast.success("👑 Welcome Admin! Redirecting to dashboard...", {
+            id: loadId,
+          });
+
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 500);
+        } else {
+          toast.success("🎉 Welcome! You are logged in as a user.", {
+            id: loadId,
+          });
+
+          // ❌ NO redirect
+          // user এই page এই থাকবে
+        }
+      }
+    } catch (error: any) {
+      console.error("Login Error:", error);
+
+      const message =
+        error.response?.data?.message || "Login failed!";
+
+      toast.error(message, { id: loadId });
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen bg-[#F9E4CB] flex flex-col items-center justify-center py-12 px-4 font-sans">
+      <div className="max-w-[500px] w-full">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-normal text-gray-800 mb-2 italic">
+            Sign in to your account
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+          <p className="text-sm text-gray-600">
+            Or{" "}
+            <Link
+              href="/register"
+              className="font-bold text-black border-b border-black"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              create a new account
+            </Link>
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Login Card */}
+        <div className="bg-white p-8 md:p-10 shadow-sm rounded-sm">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {/* Email */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] uppercase tracking-widest text-gray-500 font-semibold">
+                Email address
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black transition-colors"
+                required
+              />
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] uppercase tracking-widest text-gray-500 font-semibold">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black transition-colors"
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
+                >
+                  {showPassword ? (
+                    <IoEyeOffOutline size={18} />
+                  ) : (
+                    <IoEyeOutline size={18} />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between mt-1">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  name="rememberMe"
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
+                  className="w-4 h-4 accent-black"
+                />
+                <label
+                  htmlFor="rememberMe"
+                  className="text-[12px] text-gray-600 cursor-pointer"
+                >
+                  Remember me
+                </label>
+              </div>
+
+              <Link
+                href="/forgot-password"
+                className="text-[12px] font-bold text-black border-b border-black"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="w-full bg-black text-white py-4 mt-4 text-xs uppercase tracking-[0.2em] font-bold hover:bg-gray-900 transition-all"
+            >
+              Sign In
+            </button>
+          </form>
         </div>
-      </main>
+
+        {/* Bottom Text */}
+        <div className="text-center mt-10">
+          <p className="text-[12px] text-gray-500 leading-relaxed">
+            By signing in, you agree to our <br className="md:hidden" />
+            <span className="font-bold text-black underline mx-1 cursor-pointer">
+              Terms of Service
+            </span>
+            and
+            <span className="font-bold text-black underline mx-1 cursor-pointer">
+              Privacy Policy
+            </span>
+            .
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
