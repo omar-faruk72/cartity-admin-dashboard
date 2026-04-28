@@ -26,6 +26,7 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import { toast } from "react-hot-toast"; // Optional: Toast notification এর জন্য
+import { BASE_URL } from "@/app/helper/BASE_URL";
 
 type Settings = {
   siteName: string;
@@ -70,7 +71,7 @@ export default function SettingsPage() {
   } = useQuery({
     queryKey: ["siteSettings"],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:5001/api/v1/settings");
+      const { data } = await axios.get(`${BASE_URL}/settings`);
       return data.data;
     },
   });
@@ -79,7 +80,7 @@ export default function SettingsPage() {
   const updateMutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const { data } = await axios.patch(
-        "http://localhost:5001/api/v1/settings/update",
+        `${BASE_URL}/settings/update`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

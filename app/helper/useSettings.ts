@@ -1,6 +1,7 @@
 "use client";
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { BASE_URL } from './BASE_URL';
 
 // Type definition (agera code theke nite paren)
 export type Settings = {
@@ -20,7 +21,7 @@ export type Settings = {
 };
 
 const fetchSettings = async (): Promise<Settings> => {
-  const { data } = await axios.get('http://localhost:5001/api/v1/settings');
+  const { data } = await axios.get(`${BASE_URL}/settings`);
   return data.data;
 };
 

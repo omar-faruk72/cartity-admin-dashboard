@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./context/Providers";
 import { AuthProvider } from "./context/authContext";
 import { Toaster } from "react-hot-toast";
+import { BASE_URL } from "./helper/BASE_URL";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +20,7 @@ const geistMono = Geist_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   try {
     // সরাসরি API থেকে ডাটা ফেচ করা (সার্ভার সাইড)
-    const res = await fetch("http://localhost:5001/api/v1/settings", {
+    const res = await fetch(`${BASE_URL}/settings`, {
       next: { revalidate: 60 }, // প্রতি ৬০ সেকেন্ড পর পর ডাটা আপডেট হবে
     });
     const { data: settings } = await res.json();
