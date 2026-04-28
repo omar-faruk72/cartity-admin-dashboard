@@ -62,9 +62,6 @@ export default function Home() {
           toast.success("🎉 Welcome! You are logged in as a user.", {
             id: loadId,
           });
-
-          // ❌ NO redirect
-          // user এই page এই থাকবে
         }
       }
     } catch (error: any) {
@@ -83,17 +80,8 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-normal text-gray-800 mb-2 italic">
-            Sign in to your account
+            admin login
           </h1>
-          <p className="text-sm text-gray-600">
-            Or{" "}
-            <Link
-              href="/register"
-              className="font-bold text-black border-b border-black"
-            >
-              create a new account
-            </Link>
-          </p>
         </div>
 
         {/* Login Card */}
@@ -161,13 +149,6 @@ export default function Home() {
                   Remember me
                 </label>
               </div>
-
-              <Link
-                href="/forgot-password"
-                className="text-[12px] font-bold text-black border-b border-black"
-              >
-                Forgot your password?
-              </Link>
             </div>
 
             {/* Submit */}
@@ -178,21 +159,6 @@ export default function Home() {
               Sign In
             </button>
           </form>
-        </div>
-
-        {/* Bottom Text */}
-        <div className="text-center mt-10">
-          <p className="text-[12px] text-gray-500 leading-relaxed">
-            By signing in, you agree to our <br className="md:hidden" />
-            <span className="font-bold text-black underline mx-1 cursor-pointer">
-              Terms of Service
-            </span>
-            and
-            <span className="font-bold text-black underline mx-1 cursor-pointer">
-              Privacy Policy
-            </span>
-            .
-          </p>
         </div>
       </div>
     </div>
