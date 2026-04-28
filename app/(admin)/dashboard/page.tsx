@@ -180,7 +180,7 @@ const DashboardOverview: React.FC = () => {
         ) : (
           <>
             <Link
-              href="/admin/orders?status=Pending"
+              href="/dashboard/orders"
               className="flex items-center justify-between bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:border-orange-200 transition-all group"
             >
               <div className="flex items-center gap-4">
@@ -200,7 +200,7 @@ const DashboardOverview: React.FC = () => {
             </Link>
 
             <Link
-              href="/admin/products?filter=low-stock"
+              href="/dashboard/low-stock"
               className="flex items-center justify-between bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:border-red-200 transition-all group"
             >
               <div className="flex items-center gap-4">
